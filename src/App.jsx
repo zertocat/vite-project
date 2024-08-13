@@ -1,5 +1,3 @@
-// import "./App.css";
-
 import CountriesCatalog from "./pages/country-catalog/Index";
 
 function App() {

@@ -229,6 +229,7 @@ const CountriesCatalog = () => {
         footer={null}
         // confirmLoading={confirmLoading}
         onCancel={handleCancel}
+        width={1000}
       >
         <CountryInfo {...{ info }} />
       </Modal>
