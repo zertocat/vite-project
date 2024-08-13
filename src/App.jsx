@@ -1,11 +1,11 @@
-import "./App.css";
+// import "./App.css";
+
+import CountriesCatalog from "./pages/country-catalog/Index";
 
 function App() {
   return (
     <>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <CountriesCatalog />
     </>
   );
 }
