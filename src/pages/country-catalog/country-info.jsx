@@ -78,6 +78,8 @@ const CountryInfo = (props) => {
             {info?.borders?.length > 0 ? info.borders.toString() : "N/a"}
           </Col>
         </Row>
+      </Col>
+      <Col xs={24} lg={12}>
         <Row gutter={[8, 8]}>
           <Col xs={6}>
             <span>Area</span>
@@ -103,8 +105,6 @@ const CountryInfo = (props) => {
             {info.population ? <span>{info.population}</span> : "N/a"}
           </Col>
         </Row>
-      </Col>
-      <Col xs={24} lg={12}>
         <Row gutter={[8, 8]}>
           <Col xs={6}>
             <span>Time Zone</span>
@@ -117,6 +117,23 @@ const CountryInfo = (props) => {
                   ? info.timezones.toString()
                   : "N/a"
                 : "N/a"}
+            </span>
+          </Col>
+        </Row>
+        <Row gutter={[8, 8]}>
+          <Col xs={6}>
+            <span>Detail </span>
+          </Col>
+          <Col>:</Col>
+          <Col xs={17}>
+            <span>
+              {info.maps ? (
+                <a href={info.maps.openStreetMaps} target="/">
+                  More information...
+                </a>
+              ) : (
+                "N/a"
+              )}
             </span>
           </Col>
         </Row>

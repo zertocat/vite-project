@@ -3,9 +3,20 @@ import { useEffect, useState } from "react";
 //
 // components
 //
-import { Card, Breadcrumb, Table, Row, Col, Input, Modal } from "antd";
+import {
+  Card,
+  Breadcrumb,
+  Table,
+  Row,
+  Col,
+  Input,
+  Modal,
+  Button,
+  Flex,
+  message,
+} from "antd";
 // icons
-import { FlagOutlined } from "@ant-design/icons";
+import { FlagOutlined, SearchOutlined } from "@ant-design/icons";
 //
 import CountryCatalog from "../../services/country-catalog";
 import CountryInfo from "./country-info";
@@ -14,11 +25,12 @@ import CountryInfo from "./country-info";
 //
 // change the component name here and export default at the below too
 const CountriesCatalog = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   //
   const [loading, setLoading] = useState(false);
   const [dataTable, setDataTable] = useState([]);
   //
-  const [tempData, setTempData] = useState([]);
+  // const [tempData, setTempData] = useState([]);
   const [search, setSearch] = useState("");
   const [totalRow, setTotalRow] = useState(0);
   //
@@ -101,18 +113,26 @@ const CountriesCatalog = () => {
     },
   });
   //
+  const error = (val) => {
+    messageApi.open({
+      type: "error",
+      content: `This country is ${val.response.data.message}`,
+    });
+  };
+  //
   const handleChangeTable = (pagination) => {
     setTableParams({
       pagination,
     });
   };
+
   //
   const getCountryLists = () => {
     setLoading(true);
+
     CountryCatalog.getCountryLists()
       .then((res) => {
         setDataTable(res);
-        setTempData(res);
         setTotalRow(res.length);
         setTableParams({
           pagination: {
@@ -138,44 +158,75 @@ const CountriesCatalog = () => {
     setIsOpen(false);
   };
   //
+  const onSearch = () => {
+    setLoading(true);
+
+    if (!search) {
+      getCountryLists();
+    } else {
+      const doc = {
+        name: search,
+      };
+      CountryCatalog.search(doc)
+        .then((res) => {
+          setDataTable(res);
+          setTotalRow(res.length);
+          setTableParams({
+            pagination: {
+              ...tableParams.pagination,
+              total: res.length,
+            },
+          });
+        })
+        .catch((err) => {
+          error(err);
+          console.log(err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  };
+  //
   useEffect(() => {
     getCountryLists();
   }, []);
 
-  useEffect(() => {
-    if (!search) {
-      setDataTable(tempData);
-      setTableParams({
-        pagination: {
-          ...tableParams.pagination,
-          total: totalRow,
-        },
-      });
-      return;
-    }
+  // useEffect(() => {
+  //   if (!search) {
+  //     setDataTable(tempData);
+  //     setTableParams({
+  //       pagination: {
+  //         ...tableParams.pagination,
+  //         total: totalRow,
+  //       },
+  //     });
+  //     return;
+  //   }
 
-    const items = tempData;
-    const temp = [];
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.name.official.toLowerCase().includes(search.toLowerCase())) {
-        temp.push(item);
-      }
-    }
-    // console.log(temp);
-    setTableParams({
-      pagination: {
-        ...tableParams.pagination,
-        total: 1,
-      },
-    });
+  //   const items = tempData;
+  //   const temp = [];
+  //   for (let i = 0; i < items.length; i++) {
+  //     const item = items[i];
+  //     if (item.name.official.toLowerCase().includes(search.toLowerCase())) {
+  //       temp.push(item);
+  //     }
+  //   }
+  //   // console.log(temp);
+  //   setTableParams({
+  //     pagination: {
+  //       ...tableParams.pagination,
+  //       total: 1,
+  //     },
+  //   });
 
-    setDataTable([...temp]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  //   setDataTable([...temp]);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [search]);
   //
   return (
     <div>
+      {contextHolder}
       <Breadcrumb
         style={{
           position: "fixed",
@@ -194,7 +245,7 @@ const CountriesCatalog = () => {
       {/* card */}
       <Card
         title={
-          <h3>
+          <h3 onClick={() => getCountryLists()} style={{ cursor: "pointer" }}>
             <FlagOutlined /> Countries Catalog
           </h3>
         }
@@ -204,11 +255,20 @@ const CountriesCatalog = () => {
         <Row style={{ marginBottom: "15px" }}>
           <Col xs={4} sm={12} md={18}></Col>
           <Col xs={20} sm={12} md={6}>
-            <Input
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <Flex>
+              <Input
+                placeholder="Search name country"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Button
+                type="primary"
+                loading={loading}
+                onClick={() => onSearch()}
+              >
+                <SearchOutlined />
+              </Button>
+            </Flex>
           </Col>
         </Row>
         <Table
